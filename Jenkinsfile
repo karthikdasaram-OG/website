@@ -2,13 +2,13 @@ pipeline {
     agent any
 
     environment {
-        DOCKERHUB_CREDENTIALS = 'dockerhub-creds'
-        IMAGE_NAME = 'karthik19112001/game-app'
+        IMAGE_NAME = "karthik19112001/website-app"
+        DOCKERHUB_CREDENTIALS = "dockerhub-creds"
     }
 
     stages {
 
-        stage('Clone Repository') {
+        stage('Checkout') {
             steps {
                 git branch: 'main',
                 url: 'https://github.com/karthikdasaram-OG/website.git'
@@ -17,7 +17,7 @@ pipeline {
 
         stage('Build Docker Image') {
             steps {
-                sh 'docker build -t $IMAGE_NAME:$BUILD_NUMBER .'
+                sh 'docker build -t $IMAGE_NAME:latest .'
             }
         }
 
@@ -30,40 +30,19 @@ pipeline {
                 )]) {
                     sh '''
                     echo $DOCKER_PASS | docker login -u $DOCKER_USER --password-stdin
-                    docker push $IMAGE_NAME:$BUILD_NUMBER
-                    docker tag $IMAGE_NAME:$BUILD_NUMBER $IMAGE_NAME:latest
                     docker push $IMAGE_NAME:latest
                     '''
                 }
             }
         }
 
-       stage('Deploy to Kubernetes') {
-        steps {
-        sh '''
-        kubectl apply -f deployment.yaml
-        kubectl apply -f service.yaml
-        '''
-    }
-}
-        stage('Deploy Container') {
+        stage('Deploy to Kubernetes') {
             steps {
                 sh '''
-                docker stop game-app || true
-                docker rm game-app || true
-                docker run -d --name game-app -p 8080:80 $IMAGE_NAME:latest
+                kubectl apply -f deployment.yaml
+                kubectl apply -f service.yaml
                 '''
             }
-        }
-    }
-
-    post {
-        success {
-            echo 'Pipeline executed successfully!'
-        }
-
-        failure {
-            echo 'Pipeline failed!'
         }
     }
 }
