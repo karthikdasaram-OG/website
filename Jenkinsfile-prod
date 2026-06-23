@@ -12,8 +12,16 @@ pipeline {
                 '''
             }
         }
+          stage('Create Namespace') {
+            steps {
+                sh '''
+                kubectl --kubeconfig=/home/ubuntu/.kube/config apply -f namespace.yaml
+                '''
+            }
+        }
 
-        stage('Deploy to Kubernetes') {
+
+          stage('Deploy to Kubernetes') {
             steps {
                 sh '''
                kubectl --kubeconfig=/home/ubuntu/.kube/config apply -f deployment.yaml
