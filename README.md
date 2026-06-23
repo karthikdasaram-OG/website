@@ -1,179 +1,198 @@
-# End-to-End CI/CD Pipeline using Jenkins, Docker, Docker Hub and Kubernetes (K3s)
+# Distributed CI/CD Pipeline with Jenkins, Docker and Kubernetes
 
-## Project Overview
+## 📌 Project Overview
 
-This project demonstrates an end-to-end CI/CD pipeline for deploying a containerized website application using Jenkins, Docker, Docker Hub, and Kubernetes (K3s).
+This project demonstrates the implementation of a distributed CI/CD pipeline using Jenkins Master-Agent architecture, Docker, DockerHub, and Kubernetes (K3s).
 
-The pipeline automates building Docker images, pushing them to Docker Hub, and deploying the application to a Kubernetes cluster.
-
----
-
-## Architecture
-
-```
-GitHub
-   ↓
-Jenkins
-   ↓
-Docker Build
-   ↓
-Docker Hub
-   ↓
-Kubernetes (K3s)
-   ↓
-Website Deployment
-```
+The pipeline automatically builds, tests, and deploys a static website across three EC2 instances.
 
 ---
 
-## Tools and Technologies
+## 🏗 Architecture
 
-* Git & GitHub
+```
+GitHub Repository
+        ↓
+EC2-1 (Jenkins Master + Job1-Build)
+        ↓
+EC2-2 (Test Agent + Job2-Test)
+        ↓
+EC2-3 (Prod Agent + Job3-Prod + Kubernetes)
+        ↓
+DockerHub
+        ↓
+Kubernetes Deployment (2 Replicas)
+        ↓
+NodePort Service (30008)
+```
+
+---
+
+## 🚀 Tech Stack
+
 * Jenkins
 * Docker
-* Docker Hub
+* DockerHub
 * Kubernetes (K3s)
-* Ubuntu EC2
-* YAML
-* Groovy (Jenkins Pipeline)
+* Git & GitHub
+* AWS EC2
+* Ubuntu Linux
 
 ---
 
-## Project Structure
+## 🖥 Infrastructure Setup
+
+### EC2-1 : Jenkins Master
+
+Components:
+
+* Jenkins
+* Git
+* Docker
+
+Responsibilities:
+
+* Executes Job1-Build
+* Triggers Job2-Test
+
+---
+
+### EC2-2 : Test Agent
+
+Components:
+
+* Docker
+* Java
+* Git
+
+Responsibilities:
+
+* Pulls Docker image from DockerHub
+* Runs container for testing
+* Triggers Job3-Prod
+
+---
+
+### EC2-3 : Production Agent
+
+Components:
+
+* Docker
+* K3s Kubernetes
+* kubectl
+
+Responsibilities:
+
+* Pulls image from DockerHub
+* Creates Kubernetes namespace
+* Deploys application to Kubernetes
+
+---
+
+## ⚙ Pipeline Stages
+
+### Job1-Build
+
+* Checkout source code from GitHub
+* Build Docker image
+* Push image to DockerHub
+* Trigger Job2-Test
+
+### Job2-Test
+
+* Pull Docker image from DockerHub
+* Run test container
+* Trigger Job3-Prod
+
+### Job3-Prod
+
+* Pull Docker image from DockerHub
+* Create namespace
+* Deploy application to Kubernetes
+* Create NodePort service
+
+---
+
+## 📂 Repository Structure
 
 ```
 website/
 │
 ├── Dockerfile
-├── Jenkinsfile
+├── namespace.yaml
 ├── deployment.yaml
 ├── service.yaml
-├── index.html
-└── README.md
+├── Jenkinsfile-build
+├── Jenkinsfile-test
+├── Jenkinsfile-prod
+├── README.md
+└── Website source files
 ```
 
 ---
 
-## Docker Image
-
-Docker Image:
-
-```
-karthik19112001/website-app:latest
-```
-
----
-
-## Kubernetes Resources
+## ☸ Kubernetes Configuration
 
 ### Deployment
 
-* Deployment Name: website-deployment
+* Namespace: devops
 * Replicas: 2
 
 ### Service
 
-* Service Name: website-service
 * Type: NodePort
 * Port: 80
 * NodePort: 30008
 
 ---
 
-## CI/CD Pipeline Stages
-
-### Stage 1: Source Code Checkout
-
-Fetch source code from GitHub repository.
-
-### Stage 2: Docker Image Build
-
-Build Docker image using Dockerfile.
-
-### Stage 3: Push Image to Docker Hub
-
-Push the latest image to Docker Hub repository.
-
-### Stage 4: Deploy to Kubernetes
-
-Deploy application to Kubernetes cluster using:
-
-* deployment.yaml
-* service.yaml
-
----
-
-## Kubernetes Commands
-
-View nodes:
-
-```bash
-kubectl get nodes
-```
-
-View pods:
-
-```bash
-kubectl get pods -n devops
-```
-
-View services:
-
-```bash
-kubectl get svc -n devops
-```
-
-View all resources:
-
-```bash
-kubectl get all -n devops
-```
-
----
-
-## Jenkins Pipeline Workflow
+## 🔄 CI/CD Workflow
 
 ```
-GitHub Repository
-        ↓
-Jenkins Pipeline
-        ↓
-Docker Image Build
-        ↓
-Docker Hub Push
-        ↓
+GitHub
+   ↓
+Job1-Build
+   ↓
+Job2-Test
+   ↓
+Job3-Prod
+   ↓
+DockerHub
+   ↓
 Kubernetes Deployment
-        ↓
-Application Available
+   ↓
+NodePort Service (30008)
 ```
 
 ---
 
-## Features
+## 📸 Project Outputs
 
-* Automated CI/CD pipeline
-* Containerized application deployment
-* Docker image management using Docker Hub
-* Kubernetes orchestration with K3s
-* Jenkins pipeline automation
-* Scalable deployment with multiple replicas
-
----
-
-## Future Enhancements
-
-* Multi-job Jenkins architecture
-* Separate Test and Production environments
-* Jenkins agents
-* GitHub Webhooks
-* SonarQube Integration
-* Trivy Security Scanning
-* Prometheus Monitoring
-* Grafana Dashboards
-* ArgoCD GitOps
-* Terraform Infrastructure Automation
+* Jenkins Master-Agent Architecture
+* Successful Build Pipeline
+* Docker Image Push to DockerHub
+* Test Container Execution
+* Kubernetes Deployment with 2 Replicas
+* NodePort Service Exposure
+* Website Accessible on Port 30008
 
 ---
 
+## 🎯 Key Learnings
 
-DevOps | AWS | Docker | Jenkins | Kubernetes
+* Distributed Jenkins Architecture
+* Pipeline as Code
+* Docker Image Management
+* DockerHub Integration
+* Kubernetes Deployments and Services
+* Namespace Management
+* Multi-node CI/CD Implementation
+* Infrastructure as Code Principles
+
+---
+
+## Author
+
+**Dasaram Karthik Reddy**
+
+LinkedIn: [www.linkedin.com/in/karthik-dasaram-7bb57a293](http://www.linkedin.com/in/karthik-dasaram-7bb57a293)
