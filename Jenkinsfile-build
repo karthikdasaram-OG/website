@@ -1,0 +1,25 @@
+pipeline {
+    agent any
+
+    stages {
+
+        stage('Clone Repository') {
+            steps {
+                git branch: 'main',
+                url: 'https://github.com/karthikdasaram-OG/website.git'
+            }
+        }
+
+        stage('Build Docker Image') {
+            steps {
+                sh 'docker build -t website:latest .'
+            }
+        }
+
+        stage('Trigger Test Job') {
+            steps {
+                build job: 'Job2-Test'
+            }
+        }
+    }
+}

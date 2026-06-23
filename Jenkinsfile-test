@@ -1,0 +1,23 @@
+pipeline {
+    agent {
+        label 'test-agent'
+    }
+
+    stages {
+
+        stage('Run Container') {
+            steps {
+                sh '''
+                docker rm -f test-container || true
+                docker run -d --name test-container -p 8081:80 website:latest
+                '''
+            }
+        }
+
+        stage('Trigger Prod Job') {
+            steps {
+                build job: 'Job3-Prod'
+            }
+        }
+    }
+}

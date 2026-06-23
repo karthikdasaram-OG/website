@@ -1,0 +1,38 @@
+pipeline {
+    agent {
+        label 'prod-agent'
+    }
+
+    environment {
+        DOCKERHUB_CREDENTIALS = credentials('dockerhub-creds')
+    }
+
+    stages {
+
+        stage('Docker Login') {
+            steps {
+                sh '''
+                echo $DOCKERHUB_CREDENTIALS_PSW | docker login -u $DOCKERHUB_CREDENTIALS_USR --password-stdin
+                '''
+            }
+        }
+
+        stage('Push Image') {
+            steps {
+                sh '''
+                docker tag website:latest karthik19112001/website:latest
+                docker push karthik19112001/website:latest
+                '''
+            }
+        }
+
+        stage('Deploy to Kubernetes') {
+            steps {
+                sh '''
+                kubectl apply -f deployment.yaml
+                kubectl apply -f service.yaml
+                '''
+            }
+        }
+    }
+}
