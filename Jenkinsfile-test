@@ -5,11 +5,19 @@ pipeline {
 
     stages {
 
+        stage('Pull Image') {
+            steps {
+                sh '''
+                docker pull karthik19112001/website:latest
+                '''
+            }
+        }
+
         stage('Run Container') {
             steps {
                 sh '''
                 docker rm -f test-container || true
-                docker run -d --name test-container -p 8081:80 website:latest
+                docker run -d --name test-container -p 8081:80 karthik19112001/website:latest
                 '''
             }
         }
